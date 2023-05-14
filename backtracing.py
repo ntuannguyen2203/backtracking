@@ -277,14 +277,18 @@ def forward_checking(csp, var, value, assignment, removals):
  
 
 # Backtracking search
-def backtracking_search(csp, select_unassigned_variable=minimum_remaining_values,
-                        order_domain_values=least_constraining_value, 
-                        inference=forward_checking):
-    def backtrack(assignment):            
-    """See [Figure 6.5] for the algorithm"""       
-    
-    ''' ADD YOUR CODE HERE '''
-
+def backtrack(assignment):
+    if len(assignment) == len(csp.variables):
+        return assignment
+    var = select_unassigned_variable(assignment)
+    for value in order_domain_values(var, assignment, csp):
+        if csp.nconflicts(var, value, assignment) == 0:
+            csp.assign(var, value, assignment)
+            result = backtrack(assignment)
+            if result is not None:
+                return result
+            csp.unassign(var, assignment)
+    return None
 
 def restore(csp, removals):
     """Undo a supposition and all inferences from it."""
@@ -294,14 +298,10 @@ def restore(csp, removals):
 
 #%% main
 if __name__ == '__main__':       
-    init_assign_easy = ''' ENTER THE INITIAL ASSIGNMENT OF THE SUDOKU '''
-    sodoku = Sudoku(init_assign_easy)
-    #print('VARIABLES:');sodoku.display_variables()
-    print('EASY SUDOKU:'); sodoku.display() 
-    AC3(sodoku)
-    print('SOLUTION TO THE EASY SUDOKU:'); sodoku.display()
 
-    init_assign_hard = ''' ENTER THE INITIAL ASSIGNMENT OF THE SUDOKU '''
+
+    init_assign_hard = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..' 
+    
     sodoku = Sudoku(init_assign_hard)
     print('\nHARD SUDOKU:'); sodoku.display()      
     backtracking_search(sodoku)
@@ -314,3 +314,5 @@ if __name__ == '__main__':
 
 
     
+
+# %%
